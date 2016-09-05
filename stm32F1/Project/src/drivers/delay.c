@@ -25,11 +25,9 @@ void DelayUs(unsigned int us)
     SysTick->LOAD=us*fac_us;             //加载时间
     SysTick->VAL=0x00;                   //清空计时器
     SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;
-    do
-    {
+    do {
         temp=SysTick->CTRL;
-    }
-    while(temp&0x01&&!(temp&(1<<16)));         //等待时间到达
+    } while(temp&0x01&&!(temp&(1<<16)));       //等待时间到达
     SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;   //关闭计时器
     SysTick->VAL=0x00;                         //清空计时器
 }
@@ -41,11 +39,9 @@ void DelayMs(unsigned int ms)
     SysTick->LOAD=ms*fac_ms;
     SysTick->VAL=0x00;
     SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;
-    do
-    {
+    do {
         temp=SysTick->CTRL;
-    }
-    while(temp&0x01&&!(temp&(1<<16)));
+    } while(temp&0x01&&!(temp&(1<<16)));
     SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;
     SysTick->VAL=0x00;
 }
@@ -54,8 +50,7 @@ void DelayMs(unsigned int ms)
 void DelayS(unsigned int s)
 {
     unsigned char i;
-    for(i=0;i<s;i++)
-    {
+    for(i=0; i<s; i++) {
         DelayMs(1000);
     }
 }
