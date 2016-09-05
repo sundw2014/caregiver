@@ -1,7 +1,7 @@
 #include "stm32f10x.h"
 #include "spi.h"
 #include "delay.h"
-#include "usart1.h"
+#include "usart.h"
 
 /*******************************************************************************
 * Function Name  : SPI1_Init

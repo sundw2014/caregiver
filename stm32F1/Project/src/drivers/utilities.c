@@ -1,6 +1,7 @@
 #include "stm32f10x.h"
 #include "utilities.h"
 #include "tim.h"
+#include "delay.h"
 
 static void Motor_GPIO_Init()
 {
@@ -34,8 +35,18 @@ void setServoAngle(enum Servo s, float angle)
 
 void Init(void)
 {
-  Motor_GPIO_Init();
-  TIM5_PWM_Init();
-  TIM4_PWM_Init();
-  TIM3_PWM_Init();
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);           //中断优先级分组为2 note:2 bits for pre-emption priority, 2 bits for subpriority
+
+  DelayInit();   //SysTick init
+	// DelayS(1);
+
+	USART1_Init(); //user serial port
+  USART3_Init(); //bluetooth
+
+  Motor_GPIO_Init(); //Motor GPIO
+
+  TIM1_Init(); //Receiver channel 5,6
+  TIM5_PWM_Init(); //Motor PWM
+  TIM3_PWM_Init(); //Servo PWM
+  TIM4_Init(); //Receiver channel 1,2,3,4
 }

@@ -1,7 +1,16 @@
-#include "usart1.h"
+#include "usart.h"
+#include "utilities.h"
 
-void USART1_NVIC_Config(void);
-void _ttywrch(int ch);
+static void USART1_NVIC_Config(void)
+{
+  NVIC_InitTypeDef NVIC_InitStructure;
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+}
 
 void USART1_Init(void)
 {
@@ -40,40 +49,75 @@ void USART1_Init(void)
 	USART_Cmd(USART1, ENABLE);
 }
 
-void USART1_NVIC_Config(void)
-{
-  NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
-  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
-
-
  void USART1_IRQHandler (void)
  {
-	static unsigned char totalByteCNT=0,stopByteCNT=0 ,ackByteCNT=0;	//接受到的总字节数，接受到的停止字节个数
-
  	if(USART_GetFlagStatus(USART1,USART_FLAG_RXNE)!=RESET)
  	{
+//		BluetoothReceiveInterruput(USART_GetData(USART3));
 		USART_ClearFlag(USART1,USART_IT_RXNE);
 		USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 	}
  }
 
-int fputc(int ch, FILE *f)
-{
-
-	USART_SendData(USART1, (unsigned char) ch);
-	while (!(USART1->SR & USART_FLAG_TXE));
-//	while( USART_GetFlagStatus(USART1,USART_FLAG_TC)!= SET);
-	return (ch);
-}
 
 
-char *itoa(int value, char *string, int radix)
+ static void USART3_NVIC_Config(void)
+ {
+	 NVIC_InitTypeDef NVIC_InitStructure;
+	 NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	 NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+	 NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	 NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	 NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	 NVIC_Init(&NVIC_InitStructure);
+ }
+
+ void USART3_Init(void)
+ {
+ 	GPIO_InitTypeDef GPIO_InitStructure;
+ 	USART_InitTypeDef USART_InitStructure;
+
+ 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3 , ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
+
+ 	/* USART3 GPIO config */
+ 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+ 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+ 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+ 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+ 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+ 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+ 	/* USART1 mode config */
+ 	USART_InitStructure.USART_BaudRate = 115200;
+ 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 	USART_InitStructure.USART_Parity = USART_Parity_No ;
+ 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+ 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 	USART_Init(USART3, &USART_InitStructure);
+ 	USART_ITConfig(USART3,USART_IT_RXNE,ENABLE);
+ 	USART_Cmd(USART3, ENABLE);
+
+ 	USART_ClearFlag(USART3,USART_IT_RXNE);
+ 	USART_ClearITPendingBit(USART3,USART_IT_RXNE);
+ 	USART_ITConfig(USART3,USART_IT_RXNE,ENABLE);
+
+ 	USART_Cmd(USART3, ENABLE);
+ }
+
+  void USART3_IRQHandler (void)
+  {
+  	if(USART_GetFlagStatus(USART3,USART_FLAG_RXNE)!=RESET)
+  	{
+			BluetoothReceiveInterruput(USART_ReceiveData(USART3));
+ 			USART_ClearFlag(USART3,USART_IT_RXNE);
+ 			USART_ClearITPendingBit(USART3,USART_IT_RXNE);
+ 		}
+  }
+
+char* itoa(int value, char *string, int radix)
 {
 	int     i, d;
 	int     flag = 0;
@@ -119,36 +163,6 @@ char *itoa(int value, char *string, int radix)
 	return string;
 
 } /* NCL_Itoa */
-
-
-/* Retargeting functions for gcc-arm-embedded */
-
-int _write (int fd, char *ptr, int len)
-{
-  /* Write "len" of char from "ptr" to file id "fd"
-   * Return number of char written.
-   * Need implementing with UART here. */
-  int i;
-  for (i = 0; i < len; ++i)
-  {
-    _ttywrch(ptr[i]);
-  }
-  return len;
-}
-
-int _read (int fd, char *ptr, int len)
-{
-  /* Read "len" of char to "ptr" from file id "fd"
-   * Return number of char read.
-   * Need implementing with UART here. */
-  return len;
-}
-
-void _ttywrch(int ch) {
-  /* Write one char "ch" to the default console
-   * Need implementing with UART here. */
-  fputc(ch, NULL);
-}
 
 void myPrintf(uint8_t *Data,...)
 {
@@ -214,11 +228,11 @@ void myPrintf(uint8_t *Data,...)
 	}
 }
 
-void USART1_SendBytes(u8 *p, int length)
+void USART_SendBytes(u8 *p, int length, USART_TypeDef* USARTx)
 {
 	for(int i=0;i<length;i++)
 	{
-		USART_SendData(USART1, *p++);
-		while( USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET );
+		USART_SendData(USARTx, *p++);
+		while( USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET );
 	}
 }

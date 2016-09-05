@@ -1,7 +1,7 @@
 #include "stm32f10x.h"
 #include "i2c.h"
 #include "jy901.h"
-#include "usart1.h"
+#include "usart.h"
 
 static s16 JY901_MAX_MAG_FRONT[3] = {-0x7FFF, -0x7FFF, -0x7FFF};
 static s16 JY901_MIN_MAG_FRONT[3] = {0x7FFF, 0x7FFF, 0x7FFF};

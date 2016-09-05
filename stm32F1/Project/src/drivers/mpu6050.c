@@ -1,7 +1,7 @@
 #include "stm32f10x.h"
 #include "i2c.h"
 #include "mpu6050.h"
-#include "usart1.h"
+#include "usart.h"
 
 // 0xD0 表示 MPU6050 的地址。I2C从器件（在此当然是指 MPU6050）有 8 位的地址，前 7 位由 WHO AM I 确定，第 8 位由 AD0 的电平决定。
 //WHO AM I 默认值是 0x68H（1101000B），AD0 接低电平，所以 MPU6050 的 I2C 地址是 0xD0H（11010000B）。

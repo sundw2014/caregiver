@@ -1,15 +1,12 @@
 #include <stdlib.h>
 #include "stm32f10x.h"
-#include "usart1.h"
+#include "usart.h"
 #include "tim.h"
 #include "utilities.h"
 
 void main()
 {
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);           //中断优先级分组为2 note:2 bits for pre-emption priority, 2 bits for subpriority
-	DelayInit();
-	DelayS(1);
-	USART1_Init();
+
 
 	//myPrintf("test1\r\n");
 	// for(int i=0;i<1;i++)
