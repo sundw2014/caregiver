@@ -27,10 +27,10 @@ static void TIM5_Mode_Config(void)
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-    u16 CCR1_Val = 1000;
-    u16 CCR2_Val = 3000;
-    u16 CCR3_Val = 3000;
-    u16 CCR4_Val = 3000;
+    u16 CCR1_Val = 0;
+    u16 CCR2_Val = 0;
+    u16 CCR3_Val = 0;
+    u16 CCR4_Val = 0;
 
     /* Time base configuration */
     TIM_TimeBaseStructure.TIM_Period = MOTOR_PWM_PERIOD - 1;       //14kHz
@@ -114,10 +114,10 @@ static void TIM3_Mode_Config(void)
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-    u16 CCR1_Val = 1000;
-    u16 CCR2_Val = 2000;
-    u16 CCR3_Val = 3000;
-    u16 CCR4_Val = 4000;
+    u16 CCR1_Val = 1500;
+    u16 CCR2_Val = 1500;
+    u16 CCR3_Val = 1500;
+    u16 CCR4_Val = 1500;
 
     /* Time base configuration */
     TIM_TimeBaseStructure.TIM_Period = MOTOR_PWM_PERIOD - 1;       //14kHz

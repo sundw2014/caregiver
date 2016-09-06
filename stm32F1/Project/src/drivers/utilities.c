@@ -25,12 +25,100 @@ static void Motor_GPIO_Init()
 
 void setMotorSpeed(enum Motor m, int speed)
 {
+  switch(m)
+  {
+    case motor1:{
+      if(speed > 0){
+        GPIO_SetBits(GPIOB,GPIO_Pin_13);
+        GPIO_ResetBits(GPIOB,GPIO_Pin_12);
+        TIM_SetCompare1(TIM5, speed);
+      }
+      else{
+        GPIO_ResetBits(GPIOB,GPIO_Pin_13);
+        GPIO_SetBits(GPIOB,GPIO_Pin_12);
+        TIM_SetCompare1(TIM5, -speed);
+      }
+      break;
+    }
 
+    case motor2:{
+      if(speed > 0){
+        GPIO_SetBits(GPIOC,GPIO_Pin_2);
+        GPIO_ResetBits(GPIOC,GPIO_Pin_3);
+        TIM_SetCompare2(TIM5, speed);
+      }
+      else{
+        GPIO_ResetBits(GPIOC,GPIO_Pin_2);
+        GPIO_SetBits(GPIOC,GPIO_Pin_3);
+        TIM_SetCompare2(TIM5, -speed);
+      }
+      break;
+    }
+
+    case motor3:{
+      if(speed > 0){
+        GPIO_SetBits(GPIOC,GPIO_Pin_5);
+        GPIO_ResetBits(GPIOC,GPIO_Pin_4);
+        TIM_SetCompare3(TIM5, speed);
+      }
+      else{
+        GPIO_ResetBits(GPIOC,GPIO_Pin_5);
+        GPIO_SetBits(GPIOC,GPIO_Pin_4);
+        TIM_SetCompare3(TIM5, -speed);
+      }
+      break;
+    }
+
+    case motor4:{
+      if(speed > 0){
+        GPIO_SetBits(GPIOA,GPIO_Pin_4);
+        GPIO_ResetBits(GPIOA,GPIO_Pin_5);
+        TIM_SetCompare4(TIM5, speed);
+      }
+      else{
+        GPIO_ResetBits(GPIOA,GPIO_Pin_4);
+        GPIO_SetBits(GPIOA,GPIO_Pin_5);
+        TIM_SetCompare4(TIM5, -speed);
+      }
+      break;
+    }
+
+    default:{
+      break;
+    }
+  }
 }
 
 void setServoAngle(enum Servo s, float angle)
 {
+  if(angle < -90.0){
+    angle = -90.0;
+  }
+  if(angle > 90.0){
+    angle = 90.0;
+  }
 
+  int width = (int)(angle/90.0*500.0 + 1500);
+
+  switch(s)
+  {
+    case servo1:{
+      TIM_SetCompare1(TIM3,width);
+      break;
+    }
+    case servo2:{
+      TIM_SetCompare2(TIM3,width);
+      break;
+    }
+    case servo3:{
+      TIM_SetCompare3(TIM3,width);
+      break;
+    }
+    case servo4:{
+      TIM_SetCompare4(TIM3,width);
+      break;
+    }
+  }
 }
 
 void Init(void)
