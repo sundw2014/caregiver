@@ -27,10 +27,12 @@ void main()
     //SPI_A9800_PowerUp();
     Init();
     myPrintf("Init OK\r\n");
-
+//		GPIO_ResetBits(GPIOA,GPIO_Pin_9);
+//		while(1);
     while(1)
     {
         myPrintf("ch1=%d, ch2=%d, ch3=%d, ch4=%d. ch5=%d, ch6=%d\r\n", receiverValues[1], receiverValues[2], receiverValues[3],
                  receiverValues[4], receiverValues[5], receiverValues[6]);
+        DelayMs(500);
     }
 }

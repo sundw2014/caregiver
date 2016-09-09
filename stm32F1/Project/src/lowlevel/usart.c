@@ -18,7 +18,7 @@ void USART1_Init(void)
     USART_InitTypeDef USART_InitStructure;
 
     /* config USART1 clock */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
     /* USART1 GPIO config */
     /* Configure USART1 Tx (PA.09) as alternate function push-pull */
@@ -32,7 +32,7 @@ void USART1_Init(void)
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     /* USART1 mode config */
-    USART_InitStructure.USART_BaudRate = 9600;
+    USART_InitStructure.USART_BaudRate = 115200;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     USART_InitStructure.USART_Parity = USART_Parity_No ;

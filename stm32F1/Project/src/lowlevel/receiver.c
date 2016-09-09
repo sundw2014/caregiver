@@ -4,7 +4,7 @@ static volatile u16 TIMCaptureValue[7] = {0}; //捕获到的值
 const volatile u16 *receiverValues = TIMCaptureValue;
 //volatile u8 TIMCaptureValueValid[6] = {0}; //捕获是否有效
 static volatile u8 TIMCaptureState[7] = {TIMCaptureState_RESET};  //捕获状态
-static volatile u8 TIMCapturePreviousCounter[7] = {0}; //上升沿时的计数器值
+static volatile u16 TIMCapturePreviousCounter[7] = {0}; //上升沿时的计数器值
 
 /*begin of TIM1*/
 static void RECEIVER_GPIO_Init()
@@ -15,13 +15,19 @@ static void RECEIVER_GPIO_Init()
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10; /**/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; /*PB0 PB1 输入*/
-    GPIO_Init(GPIOA,&GPIO_InitStructure);
-    GPIO_ResetBits(GPIOA,GPIO_Pin_9|GPIO_Pin_10); /*PB0 PB1 下拉*/
+    //GPIO_Init(GPIOA,&GPIO_InitStructure);
+    //GPIO_ResetBits(GPIOA,GPIO_Pin_9|GPIO_Pin_10); /*PB0 PB1 下拉*/
 
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; /**/
     GPIO_Init(GPIOB,&GPIO_InitStructure);
     GPIO_ResetBits(GPIOB, GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9); /*PB0 PB1 下拉*/
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE); /*使能GPIOB时钟*/
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13; /**/
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; /*PB0 PB1 输入*/
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOC,&GPIO_InitStructure);
 }
 static void RECEIVER_TIM1_Init()
 {
@@ -34,7 +40,7 @@ static void RECEIVER_TIM1_Init()
 
     /*初始化定时器3 TIM1*/
     TIM_TimeBaseStructure.TIM_Period = TIMCapture_PERIOD - 1; /*设定计数器自动重装值 */
-    TIM_TimeBaseStructure.TIM_Prescaler = 72-1; /*预分频器 1us*/
+    TIM_TimeBaseStructure.TIM_Prescaler = TIMCapture_PRESCALER - 1; /*预分频器 1us*/
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; /*设置时钟分割:TDTS = Tck_tim*/
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; /*TIM向上计数模式*/
     TIM_TimeBaseInit(TIM1,&TIM_TimeBaseStructure); /*根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位*/
@@ -127,7 +133,7 @@ static void RECEIVER_TIM4_Init()
 
     /*初始化定时器3 TIM4*/
     TIM_TimeBaseStructure.TIM_Period = TIMCapture_PERIOD - 1; /*设定计数器自动重装值 */
-    TIM_TimeBaseStructure.TIM_Prescaler = 72-1; /*预分频器 1us*/
+    TIM_TimeBaseStructure.TIM_Prescaler = TIMCapture_PRESCALER - 1; /*预分频器 1us*/
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; /*设置时钟分割:TDTS = Tck_tim*/
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; /*TIM向上计数模式*/
     TIM_TimeBaseInit(TIM4,&TIM_TimeBaseStructure); /*根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位*/
@@ -193,59 +199,68 @@ void TIM4_IRQHandler(void)
         if(TIMCaptureState[4] & TIMCaptureState_SET) {
             TIMCaptureState[4] |= TIMCaptureState_OVERFLOW;
         }
+        // static st=0;
+        // if(st){
+        //   GPIO_ResetBits(GPIOC,GPIO_Pin_13); /*PB0 PB1 下拉*/
+        //   st=0;
+        // }
+        // else{
+        //   GPIO_SetBits(GPIOC,GPIO_Pin_13);
+        //   st=1;
+        // }
         TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
     }
 
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC1) != RESET) {
+    if(TIM_GetITStatus(TIM4,TIM_IT_CC1) != RESET) {
         if(TIMCaptureState[1] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
-            TIMCaptureValue[1] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[1] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[1];
+            TIMCaptureValue[1] = TIM_GetCounter(TIM4) + ((!!(TIMCaptureState[1] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[1];
             TIMCaptureState[1] = TIMCaptureState_RESET;
-            TIM_OC1PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+            TIM_OC1PolarityConfig(TIM4,TIM_ICPolarity_Rising); //设置为上升沿捕获
         } else {
-            TIMCapturePreviousCounter[1] = TIM_GetCounter(TIM1);
+            TIMCapturePreviousCounter[1] = TIM_GetCounter(TIM4);
             TIMCaptureState[1] |= TIMCaptureState_SET;
-            TIM_OC1PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
+            TIM_OC1PolarityConfig(TIM4,TIM_ICPolarity_Falling); //设置为下降沿捕获
         }
-        TIM_ClearITPendingBit(TIM1,TIM_IT_CC1);
+        TIM_ClearITPendingBit(TIM4,TIM_IT_CC1);
     }
 
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC2) != RESET) {
+    if(TIM_GetITStatus(TIM4,TIM_IT_CC2) != RESET) {
         if(TIMCaptureState[2] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
-            TIMCaptureValue[2] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[2] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[2];
+            TIMCaptureValue[2] = TIM_GetCounter(TIM4) + ((!!(TIMCaptureState[2] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[2];
             TIMCaptureState[2] = TIMCaptureState_RESET;
-            TIM_OC2PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+            TIM_OC2PolarityConfig(TIM4,TIM_ICPolarity_Rising); //设置为上升沿捕获
         } else {
-            TIMCapturePreviousCounter[2] = TIM_GetCounter(TIM1);
+            TIMCapturePreviousCounter[2] = TIM_GetCounter(TIM4);
             TIMCaptureState[2] |= TIMCaptureState_SET;
-            TIM_OC2PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
+            TIM_OC2PolarityConfig(TIM4,TIM_ICPolarity_Falling); //设置为下降沿捕获
         }
-        TIM_ClearITPendingBit(TIM1,TIM_IT_CC2);
+        TIM_ClearITPendingBit(TIM4,TIM_IT_CC2);
     }
 
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC3) != RESET) {
+    if(TIM_GetITStatus(TIM4,TIM_IT_CC3) != RESET) {
         if(TIMCaptureState[3] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
-            TIMCaptureValue[3] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[3] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[3];
+            TIMCaptureValue[3] = TIM_GetCounter(TIM4) + ((!!(TIMCaptureState[3] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[3];
             TIMCaptureState[3] = TIMCaptureState_RESET;
-            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+            TIM_OC3PolarityConfig(TIM4,TIM_ICPolarity_Rising); //设置为上升沿捕获
         } else {
-            TIMCapturePreviousCounter[3] = TIM_GetCounter(TIM1);
+            TIMCapturePreviousCounter[3] = TIM_GetCounter(TIM4);
             TIMCaptureState[3] |= TIMCaptureState_SET;
-            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
+            TIM_OC3PolarityConfig(TIM4,TIM_ICPolarity_Falling); //设置为下降沿捕获
         }
-        TIM_ClearITPendingBit(TIM1,TIM_IT_CC3);
+        TIM_ClearITPendingBit(TIM4,TIM_IT_CC3);
     }
 
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC4) != RESET) {
+    if(TIM_GetITStatus(TIM4,TIM_IT_CC4) != RESET) {
         if(TIMCaptureState[4] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
-            TIMCaptureValue[4] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[4] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[4];
+            TIMCaptureValue[4] = TIM_GetCounter(TIM4) + ((!!(TIMCaptureState[4] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[4];
             TIMCaptureState[4] = TIMCaptureState_RESET;
-            TIM_OC4PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+            TIM_OC4PolarityConfig(TIM4,TIM_ICPolarity_Rising); //设置为上升沿捕获
         } else {
-            TIMCapturePreviousCounter[4] = TIM_GetCounter(TIM1);
+            TIMCapturePreviousCounter[4] = TIM_GetCounter(TIM4);
             TIMCaptureState[4] |= TIMCaptureState_SET;
-            TIM_OC4PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
+            TIM_OC4PolarityConfig(TIM4,TIM_ICPolarity_Falling); //设置为下降沿捕获
         }
-        TIM_ClearITPendingBit(TIM1,TIM_IT_CC4);
+        TIM_ClearITPendingBit(TIM4,TIM_IT_CC4);
     }
 
 }
@@ -254,6 +269,6 @@ void TIM4_IRQHandler(void)
 void RECEIVER_Init()
 {
     RECEIVER_GPIO_Init();
-    RECEIVER_TIM1_Init();
+    //RECEIVER_TIM1_Init();
     RECEIVER_TIM4_Init();
 }

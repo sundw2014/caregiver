@@ -8,6 +8,7 @@
 #define TIMCaptureState_OVERFLOW 0x02
 
 #define TIMCapture_PERIOD                  50000   //us
+#define TIMCapture_PRESCALER               72
 #define IsTIMCaptureValueValid(VAL)              ((VAL<2000) && (VAL>1000))
 
 void RECEIVER_Init(void);
