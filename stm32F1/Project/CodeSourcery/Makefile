@@ -92,7 +92,7 @@ SRC_DIR = ../
 
 # SRC files
 SRC = $(wildcard $(SRC_DIR)src/*.c)
-SRC += $(wildcard $(SRC_DIR)src/drivers/*.c)
+SRC += $(wildcard $(SRC_DIR)src/lowlevel/*.c)
 SRC += $(wildcard $(SRC_DIR)../Libraries/STM32F10x_StdPeriph_Driver/src/*.c)
 SRC += $(SRC_DIR)../Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c
 
@@ -162,8 +162,8 @@ LINKERSCRIPTPATH = ./
 #     Each directory must be seperated by a space.
 #EXTRAINCDIRS = ../.. ../../utils ../../lib_src
 EXTRAINCDIRS = ../
-EXTRAINCDIRS = ../inc
-EXTRAINCDIRS = ../inc/drivers
+EXTRAINCDIRS += ../inc
+EXTRAINCDIRS += ../inc/lowlevel
 EXTRAINCDIRS += ../../Libraries/STM32F10x_StdPeriph_Driver/inc
 EXTRAINCDIRS += ../../Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x
 EXTRAINCDIRS += ../../Libraries/CMSIS/CM3/CoreSupport
