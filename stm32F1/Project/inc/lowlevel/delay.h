@@ -3,7 +3,7 @@
 
 #include "stm32f10x.h"
 
-void DelayInit();
+void DelayInit(void);
 void delayMicroseconds(u32);
 void DelayUs(unsigned int us);
 void DelayMs(unsigned int ms);

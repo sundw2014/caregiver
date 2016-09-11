@@ -125,7 +125,6 @@ void TIM1_UP_IRQHandler()
 /*begin of TIM4*/
 static void RECEIVER_TIM4_Init()
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_ICInitTypeDef TIM4_ICInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;

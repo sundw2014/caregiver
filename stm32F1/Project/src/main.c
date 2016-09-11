@@ -1,7 +1,7 @@
 #include "common.h"
 #include "utilities.h"
 
-void main()
+int main()
 {
     Init();
 
