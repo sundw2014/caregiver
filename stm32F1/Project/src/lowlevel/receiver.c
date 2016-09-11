@@ -1,8 +1,8 @@
 #include "receiver.h"
+#include "usart.h"
 
 static volatile u16 TIMCaptureValue[7] = {0}; //捕获到的值
 const volatile u16 *receiverValues = TIMCaptureValue;
-//volatile u8 TIMCaptureValueValid[6] = {0}; //捕获是否有效
 static volatile u8 TIMCaptureState[7] = {TIMCaptureState_RESET};  //捕获状态
 static volatile u16 TIMCapturePreviousCounter[7] = {0}; //上升沿时的计数器值
 
@@ -10,24 +10,26 @@ static volatile u16 TIMCapturePreviousCounter[7] = {0}; //上升沿时的计数�
 static void RECEIVER_GPIO_Init()
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE); /*使能GPIOB时钟*/
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE); /*使能GPIOB时钟*/
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10; /**/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; /*PB0 PB1 输入*/
-    //GPIO_Init(GPIOA,&GPIO_InitStructure);
-    //GPIO_ResetBits(GPIOA,GPIO_Pin_9|GPIO_Pin_10); /*PB0 PB1 下拉*/
 
+    #ifndef USE_USART1
+      RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE); /*使能GPIOB时钟*/
+      GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10; /**/
+      GPIO_Init(GPIOA,&GPIO_InitStructure);
+      GPIO_ResetBits(GPIOA,GPIO_Pin_9|GPIO_Pin_10); /*PB0 PB1 下拉*/
+    #endif
 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE); /*使能GPIOB时钟*/
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; /**/
     GPIO_Init(GPIOB,&GPIO_InitStructure);
     GPIO_ResetBits(GPIOB, GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9); /*PB0 PB1 下拉*/
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE); /*使能GPIOB时钟*/
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13; /**/
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; /*PB0 PB1 输入*/
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOC,&GPIO_InitStructure);
+    // RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE); /*使能GPIOC时钟*/
+    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13; /**/
+    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; /*PB0 PB1 输入*/
+    // GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    // GPIO_Init(GPIOC,&GPIO_InitStructure);
 }
 static void RECEIVER_TIM1_Init()
 {
@@ -36,7 +38,6 @@ static void RECEIVER_TIM1_Init()
     NVIC_InitTypeDef NVIC_InitStructure;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);    /*使能TIM1时钟*/
-
 
     /*初始化定时器3 TIM1*/
     TIM_TimeBaseStructure.TIM_Period = TIMCapture_PERIOD - 1; /*设定计数器自动重装值 */
@@ -181,7 +182,7 @@ static void RECEIVER_TIM4_Init()
 }
 
 /**
-* 定时器1输入捕获中断服务程序
+* 定时器4输入捕获中断服务程序
 */
 void TIM4_IRQHandler(void)
 {
@@ -199,15 +200,6 @@ void TIM4_IRQHandler(void)
         if(TIMCaptureState[4] & TIMCaptureState_SET) {
             TIMCaptureState[4] |= TIMCaptureState_OVERFLOW;
         }
-        // static st=0;
-        // if(st){
-        //   GPIO_ResetBits(GPIOC,GPIO_Pin_13); /*PB0 PB1 下拉*/
-        //   st=0;
-        // }
-        // else{
-        //   GPIO_SetBits(GPIOC,GPIO_Pin_13);
-        //   st=1;
-        // }
         TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
     }
 
@@ -262,13 +254,12 @@ void TIM4_IRQHandler(void)
         }
         TIM_ClearITPendingBit(TIM4,TIM_IT_CC4);
     }
-
 }
 /*end of TIM4*/
 
 void RECEIVER_Init()
 {
     RECEIVER_GPIO_Init();
-    //RECEIVER_TIM1_Init();
+    RECEIVER_TIM1_Init();
     RECEIVER_TIM4_Init();
 }

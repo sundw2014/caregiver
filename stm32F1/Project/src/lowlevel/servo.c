@@ -32,11 +32,21 @@ static void SERVO_TIM_Config(void)
 
     /* Time base configuration */
     TIM_TimeBaseStructure.TIM_Period = SERVO_TIM_PERIOD - 1;
-    TIM_TimeBaseStructure.TIM_Prescaler = 0;
+    TIM_TimeBaseStructure.TIM_Prescaler = SERVO_TIM_PRESCALER - 1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1 ;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+
+    // /*中断分组初始化*/
+    // NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;    /*TIM1中断*/
+    // NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; /*先占优先级0级*/
+    // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; /*从优先级0级*/
+    // NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; /*IRQ通道被使能*/
+    // NVIC_Init(&NVIC_InitStructure);
+    //
+    // TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);/*允许更新中断*/
+    // TIM_Cmd(TIM3,ENABLE); /*使能定时器1*/
 
     /* PWM1 Mode configuration: Channel1 */
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
@@ -78,6 +88,20 @@ static void SERVO_TIM_Config(void)
     TIM_Cmd(TIM3, ENABLE);
 }
 
+// void TIM3_IRQHandler()
+// {
+//   if(TIM_GetITStatus(TIM3,TIM_IT_Update) != RESET) {
+//       static int servo_cnt=0;
+//       static int servo_previous_campare[4];
+//       TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
+//       if(servo_cnt==0)
+//       {
+//
+//       }
+//       else(servo_cnt==)
+//       servo_cnt++;
+//   }
+// }
 void SERVO_Init(void)
 {
     SERVO_GPIO_Config();
@@ -94,7 +118,7 @@ void setServoAngle(enum Servo s, float angle)
         angle = 90.0;
     }
 
-    int width = (int)(angle/90.0*500.0 + 1500);
+    int width = (int)(angle/90.0*500.0 + 1500.0);
 
     switch(s)
     {

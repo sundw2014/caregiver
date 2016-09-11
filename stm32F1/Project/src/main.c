@@ -1,38 +1,29 @@
-#include <stdlib.h>
-#include "stm32f10x.h"
-#include "usart.h"
+#include "common.h"
 #include "utilities.h"
 
 void main()
 {
-
-    //myPrintf("test1\r\n");
-    // for(int i=0;i<1;i++)
-    // 	delayMicroseconds(1864135);
-    // myPrintf("test2\r\n");
-    //
-    // while(1);
-    // while(1)
-    // 	myPrintf("fuck!!!\r\n");
-
-    //TIM3_Init();
-    // TIM4_Init();
-
-    //I2C1_Init();
-    // JY901_Init(1,0);
-    // myPrintf("test3\r\n");
-    //MPU6050_Initialize();
-
-    //SPI1_Init();
-    //SPI_A9800_PowerUp();
     Init();
-    myPrintf("Init OK\r\n");
-//		GPIO_ResetBits(GPIOA,GPIO_Pin_9);
-//		while(1);
+
     while(1)
     {
-        myPrintf("ch1=%d, ch2=%d, ch3=%d, ch4=%d. ch5=%d, ch6=%d\r\n", receiverValues[1], receiverValues[2], receiverValues[3],
-                 receiverValues[4], receiverValues[5], receiverValues[6]);
-        DelayMs(500);
+        //myPrintf(USART1, "ch1=%d, ch2=%d, ch3=%d, ch4=%d. ch5=%d, ch6=%d\r\n", receiverValues[1], receiverValues[2], receiverValues[3],\
+        receiverValues[4], receiverValues[5], receiverValues[6]);
+        //myPrintf(USART1,"%d,%d,%d,%d,%d,%d,%d\r\n",BTBuf[0],BTBuf[1],BTBuf[2],BTBuf[3],BTBuf[4],BTBuf[5],BTBuf[6]);
+        int speed = (BTBuf[1]-100)/100.0*5000.0;
+        int speed1=0,speed2=0;
+        int turn = BTBuf[0] - 100;
+        if(turn>30||turn<-30) {
+        speed1=(BTBuf[0]-100)/100.0*5000.0;
+            speed2=-speed1;
+        }
+        else {
+            speed1=speed2=speed;
+        }
+        setMotorSpeed(motor1,speed1);
+        setMotorSpeed(motor2,speed2);
+        int angle=(BTBuf[3]-100)/100.0*90.0;
+        setServoAngle(servo1,angle);
+        //DelayMs(500);
     }
 }

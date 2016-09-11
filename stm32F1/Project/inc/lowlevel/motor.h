@@ -8,6 +8,7 @@ enum Motor{
 };
 
 #define MOTOR_TIM_PERIOD 5000
+#define MOTOR_TIM_PRESCALER 72
 
 void MOTOR_Init(void);
 void setMotorSpeed(enum Motor m, int speed);//speed must be a integer in -5000 ~ 5000
