@@ -1,6 +1,8 @@
 #include "usart.h"
 #include "utilities.h"
 
+__attribute__((weak)) void BluetoothReceiveInterruput(unsigned char c);
+
 #ifdef USE_USART1
 static void USART1_NVIC_Config(void)
 {
@@ -104,8 +106,6 @@ void USART3_Init(void)
     USART_Cmd(USART3, ENABLE);
 
 }
-
-__attribute__((weakref)) void BluetoothReceiveInterruput(unsigned char c);
 
 void USART3_IRQHandler (void)
 {
