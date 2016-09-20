@@ -1,7 +1,7 @@
 #ifndef __MY_USART1_H_
 #define __MY_USART1_H_
 
-#define USE_USART1 //串口1和接收机的5、6通道使用了相同的IO口（PA9/PA10），两个功能只能使用一个，如果使用串口1则保留这个define否则注释掉
+// #define USE_USART1 //串口1和接收机的5、6通道使用了相同的IO口（PA9/PA10），两个功能只能使用一个，如果使用串口1则保留这个define否则注释掉
 
 #include <stdarg.h>
 #include <stdlib.h>

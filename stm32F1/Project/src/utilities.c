@@ -8,8 +8,9 @@ void Init(void)
 
     DelayInit();   //SysTick init
     // DelayS(1);
-
-    USART1_Init(); //user serial port
+    #ifdef USE_USART1
+      USART1_Init(); //user serial port
+    #endif
     USART3_Init(); //bluetooth
 
     RECEIVER_Init();

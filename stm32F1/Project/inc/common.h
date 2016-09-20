@@ -8,4 +8,15 @@
 #include "usart.h"
 #include "delay.h"
 
+//defines
+#define USE_BT
+
+#ifdef USE_BT
+  #define USE_USART1
+#endif
+
+#ifdef USE_RECEIVER
+
+#endif
+
 #endif

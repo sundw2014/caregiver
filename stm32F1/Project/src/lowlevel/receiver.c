@@ -82,30 +82,30 @@ void TIM1_CC_IRQHandler(void)
 {
     // myPrintf("K\r\n");
 
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC3) != RESET) {
+    if(TIM_GetITStatus(TIM1,TIM_IT_CC2) != RESET) {
         if(TIMCaptureState[5] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
             TIMCaptureValue[5] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[5] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[5];
             TIMCaptureState[5] = TIMCaptureState_RESET;
-            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+            TIM_OC2PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
         } else {
             TIMCapturePreviousCounter[5] = TIM_GetCounter(TIM1);
             TIMCaptureState[5] |= TIMCaptureState_SET;
-            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
-        }
-        TIM_ClearITPendingBit(TIM1,TIM_IT_CC3);
-    }
-
-    if(TIM_GetITStatus(TIM1,TIM_IT_CC2) != RESET) {
-        if(TIMCaptureState[6] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
-            TIMCaptureValue[6] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[6] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[6];
-            TIMCaptureState[6] = TIMCaptureState_RESET;
-            TIM_OC2PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
-        } else {
-            TIMCapturePreviousCounter[6] = TIM_GetCounter(TIM1);
-            TIMCaptureState[6] |= TIMCaptureState_SET;
             TIM_OC2PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
         }
         TIM_ClearITPendingBit(TIM1,TIM_IT_CC2);
+    }
+
+    if(TIM_GetITStatus(TIM1,TIM_IT_CC3) != RESET) {
+        if(TIMCaptureState[6] & TIMCaptureState_SET) { //处于测量阶段，被下降沿触发
+            TIMCaptureValue[6] = TIM_GetCounter(TIM1) + ((!!(TIMCaptureState[6] & TIMCaptureState_OVERFLOW))?TIMCapture_PERIOD:0) - TIMCapturePreviousCounter[6];
+            TIMCaptureState[6] = TIMCaptureState_RESET;
+            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Rising); //设置为上升沿捕获
+        } else {
+            TIMCapturePreviousCounter[6] = TIM_GetCounter(TIM1);
+            TIMCaptureState[6] |= TIMCaptureState_SET;
+            TIM_OC3PolarityConfig(TIM1,TIM_ICPolarity_Falling); //设置为下降沿捕获
+        }
+        TIM_ClearITPendingBit(TIM1,TIM_IT_CC3);
     }
 }
 void TIM1_UP_IRQHandler()
