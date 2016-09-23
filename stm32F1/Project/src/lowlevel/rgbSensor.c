@@ -18,10 +18,10 @@ void rgbSensor_Init(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE); /*使能GPIOB时钟*/
 
   GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; /*PB0输入*/
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; /**/
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; /*PB1输入*/
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; /**/
   GPIO_Init(GPIOB,&GPIO_InitStructure);
-  GPIO_ResetBits(GPIOB,GPIO_Pin_0); /*PB0拉*/
+  GPIO_ResetBits(GPIOB,GPIO_Pin_1); /*PB1下拉*/
 
   GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_3 | GPIO_Pin_5 | GPIO_Pin_14 | GPIO_Pin_15;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
