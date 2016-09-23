@@ -7,16 +7,10 @@
 #include "receiver.h"
 #include "usart.h"
 #include "delay.h"
+#include "rgbSensor.h"
 
 //defines
 #define USE_BT
-
-#ifdef USE_BT
-  #define USE_USART1
-#endif
-
-#ifdef USE_RECEIVER
-
-#endif
+// #define USE_RECEIVER
 
 #endif

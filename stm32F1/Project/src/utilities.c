@@ -17,6 +17,9 @@ void Init(void)
     MOTOR_Init();
     SERVO_Init();
 
+    rgbSensor_Init();
+    rgbSensor_setColor(red);
+
     setMotorSpeed(motor1,0);
     setMotorSpeed(motor2,0);
     setMotorSpeed(motor3,0);
