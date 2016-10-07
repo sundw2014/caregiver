@@ -14,7 +14,7 @@ static void SERVO_GPIO_Config(void)
 
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
@@ -74,13 +74,13 @@ static void SERVO_TIM_Config(void)
 
     TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
-    /* PWM1 Mode configuration: Channel4 */
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = CCR4_Val;
-
-    TIM_OC4Init(TIM3, &TIM_OCInitStructure);
-
-    TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
+    // /* PWM1 Mode configuration: Channel4 */
+    // TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    // TIM_OCInitStructure.TIM_Pulse = CCR4_Val;
+    //
+    // TIM_OC4Init(TIM3, &TIM_OCInitStructure);
+    //
+    // TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
     TIM_ARRPreloadConfig(TIM3, ENABLE);
 

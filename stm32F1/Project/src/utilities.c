@@ -8,13 +8,17 @@ void Init(void)
 
     DelayInit();   //SysTick init
     // DelayS(1);
-
-    USART1_Init(); //user serial port
+    #ifdef USE_USART1
+      USART1_Init(); //user serial port
+    #endif
     USART3_Init(); //bluetooth
 
     RECEIVER_Init();
     MOTOR_Init();
     SERVO_Init();
+
+    rgbSensor_Init();
+    rgbSensor_setColor(red);
 
     setMotorSpeed(motor1,0);
     setMotorSpeed(motor2,0);
