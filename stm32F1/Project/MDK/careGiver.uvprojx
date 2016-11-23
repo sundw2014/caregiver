@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;..\inc;..\inc\lowlevel</IncludePath>
+              <IncludePath>..\..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x;..\inc;..\inc\lowlevel;..\..\Libraries\CMSIS\CM3\CoreSupport</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -587,6 +587,11 @@
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\lowlevel\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>rgbSensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\lowlevel\rgbSensor.c</FilePath>
             </File>
           </Files>
         </Group>
